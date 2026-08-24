@@ -1,0 +1,67 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: "3"
+method: timestamp
+
+tasks:
+  sync:
+    desc: Install dependencies
+    aliases: [deps]
+    sources:
+      - pyproject.toml
+      - uv.lock
+    generates:
+      - .venv/pyvenv.cfg
+    cmds:
+      - uv sync
+
+  dev:
+    desc: Start local dev server with hot reload
+    dotenv: ['.env']
+    env:
+      PYTHONPATH: src
+    deps:
+      - sync
+    cmds:
+      - uv run uvicorn src.interfaces.api.main:app --host 0.0.0.0 --port 8000 --reload
+    aliases: [serve]
+
+  test:
+    desc: Run tests
+    cmds:
+      - uv run python -m unittest discover -s src -t .
+
+  precommit:
+    desc: Git pre-commit checks (format + lint + typecheck)
+    cmds:
+      - task: format
+      - task: lint
+      - task: typecheck
+
+  format:
+    desc: Format with ruff
+    sources:
+      - src/**/*.py
+      - tests/**/*.py
+    cmds:
+      - ruff format .
+
+  lint:
+    desc: Lint with ruff
+    sources:
+      - src/**/*.py
+      - tests/**/*.py
+    cmds:
+      - ruff check --fix .
+
+  typecheck:
+    desc: Check types with ty
+    sources:
+      - src/**/*.py
+      - tests/**/*.py
+    cmds:
+      - uv run ty check
+
+
+
+

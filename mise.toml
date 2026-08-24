@@ -1,0 +1,25 @@
+[env]
+UV_PYTHON_PREFERENCE = "only-system"
+
+[settings]
+lockfile = true
+
+[tools]
+# language versions
+python = "3.14"
+
+# package managers
+uv = "latest"
+
+# dev tools
+task = "latest"
+prek = "latest"
+
+# global linters and formatters
+ruff = "latest"
+
+# infraestructure
+redis = "latest"
+
+# security
+trivy = "latest"
