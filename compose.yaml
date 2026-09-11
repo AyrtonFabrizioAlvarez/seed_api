@@ -1,0 +1,56 @@
+services:
+  api:
+    build: .
+    environment:
+      APP_NAME: ${APP_NAME:-Backend Seed}
+      APP_VERSION: ${APP_VERSION:-0.1.0}
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-backend_seed}
+      POSTGRES_USER: ${POSTGRES_USER:-backend_seed}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-backend_seed_dev}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/app/src
+      - ./migrations:/app/migrations
+      - ./alembic.ini:/app/alembic.ini:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    command:
+      [
+        "uv",
+        "run",
+        "uvicorn",
+        "src.interfaces.api.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000",
+        "--reload",
+      ]
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-backend_seed}
+      POSTGRES_USER: ${POSTGRES_USER:-backend_seed}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-backend_seed_dev}
+    ports:
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-backend_seed} -d ${POSTGRES_DB:-backend_seed}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

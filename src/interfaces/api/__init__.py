@@ -1,1 +1,1 @@
-"""FastAPI interface for ACOMPAÑAPP."""
+"""HTTP API interface."""

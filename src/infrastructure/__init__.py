@@ -1,1 +1,1 @@
-"""Infrastructure layer for ACOMPAÑAPP."""
+"""Infrastructure adapters used by the application."""
